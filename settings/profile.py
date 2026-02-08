@@ -1,4 +1,5 @@
 import streamlit as st
+import os
 from auth.auth_utils import get_user_details
 
 
@@ -35,12 +36,32 @@ def profile_ui():
         created_at
     ) = user
 
+    # ---------------- PATH FIX (IMPORTANT) ----------------
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    def resolve_image_path(pic_path):
+        if not pic_path:
+            return None
+
+        # already absolute
+        if os.path.isabs(pic_path) and os.path.exists(pic_path):
+            return pic_path
+
+        # relative path -> convert to absolute
+        abs_path = os.path.join(BASE_DIR, pic_path)
+        if os.path.exists(abs_path):
+            return abs_path
+
+        return None
+
+    resolved_profile_pic = resolve_image_path(profile_pic)
+
     # ---------------- PROFILE HEADER ----------------
     col1, col2 = st.columns([1, 3])
 
     with col1:
-        if profile_pic:
-            st.image(profile_pic, width=150)
+        if resolved_profile_pic:
+            st.image(resolved_profile_pic, width=150)
         else:
             st.image(
                 "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
@@ -84,7 +105,7 @@ def profile_ui():
 
     if skills:
         for skill in skills.split(","):
-            st.markdown(f"✅ {skill}")
+            st.markdown(f"✅ {skill.strip()}")
     else:
         st.info("No skills added yet.")
 
@@ -92,6 +113,4 @@ def profile_ui():
     st.divider()
     st.caption(f"🕒 Account Created On: {created_at}")
 
-    st.info(
-        "✏️ Profile editing feature can be enabled in future updates."
-    )
+    st.info("✏️ Profile editing feature can be enabled in future updates.")
