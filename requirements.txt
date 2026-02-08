@@ -1,0 +1,11 @@
+streamlit
+pandas
+numpy
+matplotlib
+seaborn
+plotly
+scikit-learn
+joblib
+bcrypt
+python-dotenv
+
